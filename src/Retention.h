@@ -14,7 +14,7 @@
 #include "loops/Looper.h"
 #include "loops/loop.h"
 
-//#include "peripheral/GyroAccel.h"
+#include "peripherals/ICM20948.h"
 //#include "peripheral/LoRaRadio.h"
 
 
@@ -48,7 +48,7 @@ private:
 
 	RetentionState retentionState = IDLE;			// initial system state is IDLE
 
-	// IMU object
+	ICM20948 * imu = new ICM20948(0x68);
 	// barometer object
 
 	// orientation servo
