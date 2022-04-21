@@ -49,7 +49,7 @@ private:
 	RetentionState retentionState = IDLE;			// initial system state is IDLE
 
 	ICM20948 * imu = new ICM20948(0x68);
-	// barometer object
+	MPL3115A2 * baro = new MPL3115A2();
 
 	// orientation servo
 	// arm deploy servo 1 and 2
