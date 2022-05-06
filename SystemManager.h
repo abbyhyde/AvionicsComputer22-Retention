@@ -16,7 +16,7 @@
 #include "src/loops/Looper.h"
 #include "src/loops/Loop.h"
 
-#include "src/Robot.h"
+#include "src/Retention.h"
 
 
 /*
@@ -53,7 +53,7 @@ public:
 
 
 //#ifdef USE_ROBOT_SYSTEM
-	Robot * robot = new Robot();
+	Retention * retention = new Retention();
 //#endif
 
 

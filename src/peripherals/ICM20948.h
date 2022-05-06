@@ -70,6 +70,15 @@ public:
     Vector getGyroRawValues(); // TODO FOR TESTING ONLY
     Vector getAccRawValues();  //TODO FOR TESTING ONLY
 
+    int16_t getAccX();
+    int16_t getAccY();
+    int16_t getAccZ();
+    int16_t getGyroX();
+    int16_t getGyroY();
+    int16_t getGyroZ();
+
+    void calibrateGyro();
+
     int16_t getTempRawValues();
 
     uint8_t getPlusMinus250DPS();
@@ -89,6 +98,18 @@ private:
     uint8_t regVal;
     uint8_t SensorRegister[14];			// last polled sensor register values stored here
 
+	const uint16_t calibrationSamples = 2000;	//This is the total number of calibration samples to be taken per calibration routine.
+    int32_t gyro_x_cal = 0;
+	int32_t gyro_y_cal = 0;
+	int32_t gyro_z_cal = 0;
+
+	int16_t acc_x_raw = 0;
+	int16_t acc_y_raw = 0;
+	int16_t acc_z_raw = 0;
+	int16_t gyro_x_raw = 0;
+	int16_t gyro_y_raw = 0;
+	int16_t gyro_z_raw = 0;
+
     void switchBank(uint8_t newBank);
 
     uint8_t writeRegister8(uint8_t bank, uint8_t reg, uint8_t val);
@@ -100,7 +121,6 @@ private:
     uint8_t resetSensor();
     void sleep(bool sleep);
     // TODO FOR TESTING ONLY Vector getGyroRawValues();
-
 
     void complementaryFilter();
 

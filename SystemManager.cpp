@@ -35,8 +35,8 @@ void SystemManager::mainSetup(){
 
 
 //#ifdef USE_ROBOT_SYSTEM
-	robot->systemInit();				// initializing system object
-	robot->registerAllLoops(looper);    // and registering its system/subsystem loops
+	retention->systemInit();				// initializing system object
+	retention->registerAllLoops(looper);    // and registering its system/subsystem loops
 //#endif
 
 

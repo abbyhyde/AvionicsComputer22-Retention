@@ -191,6 +191,14 @@ void ICM20948::readSensorData(){
 
 	}
 
+	this.acc_x_raw = processHighLowBytes(SensorRegister[0],SensorRegister[1]);
+	this.acc_y_raw = processHighLowBytes(SensorRegister[2],SensorRegister[3]);
+	this.acc_z_raw = processHighLowBytes(SensorRegister[4],SensorRegister[5]);
+
+	this.gyro_x_raw = processHighLowBytes(SensorRegister[6],SensorRegister[7]);
+	this.gyro_y_raw = processHighLowBytes(SensorRegister[8],SensorRegister[9]);
+	this.gyro_z_raw = processHighLowBytes(SensorRegister[10],SensorRegister[11]);
+
 }
 
 /*
@@ -204,27 +212,57 @@ int16_t ICM20948::processHighLowBytes(uint8_t Hbyte, uint8_t Lbyte){
 }
 
 /*
- * TODO comment this boy
- * @return A Vector containing the raw accel data
+ * based off 2020-2021 code
  */
-Vector ICM20948::getAccRawValues(){
-	Vector accRaw;
-	accRaw.x = processHighLowBytes(SensorRegister[0],SensorRegister[1]); // TODO what is this casting?
-	accRaw.y = processHighLowBytes(SensorRegister[2],SensorRegister[3]); // TODO what is this casting?
-	accRaw.z = processHighLowBytes(SensorRegister[4],SensorRegister[5]); // TODO what is this casting?
-	return accRaw;
+void ICM20948::calibrateGyro() {
+
+	Serial.println(F("Gyro calibrating, don't move it!!!"));
+
+	for(int cal_int = 0; cal_int < calibrationSamples; cal_int++){
+	  if(cal_int % 125 == 0)
+		  Serial.print(".");
+	  updateSensorValues();
+	  gyro_x_cal += gyro_x;
+	  gyro_y_cal += gyro_y;
+	  gyro_z_cal += gyro_z;
+	  delay(3);
+	}
+
+	gyro_x_cal /= calibrationSamples;
+	gyro_y_cal /= calibrationSamples;
+	gyro_z_cal /= calibrationSamples;
+
+	Serial.println(gyro_x_cal); 				//Check to see if calibration was successfull. Value should be very close to 0.
+	Serial.println(gyro_y_cal); 				//Check to see if calibration was successfull. Value should be very close to 0.
+	Serial.println(gyro_z_cal); 				//Check to see if calibration was successfull. Value should be very close to 0.
+
+	delay(2000); 	//DELETE WHEN DONE!!! Delay to allow for previous prints to be read. DELETE WHEN DONE!!!
+
+	Serial.println(F("Done Calibrating!"));	//Alerts that the Gyro has completed it's calibration routine.
 }
 
 /*
- * TODO comment this boy
- * @return A Vector containing the raw gyro data
+ * An iterative function that filters the roll and pitch for every time the data updates
+ * Based on code from 2020-2021 year
  */
-Vector ICM20948::getGyroRawValues(){
-	Vector gyroRaw;
-	gyroRaw.x = processHighLowBytes(SensorRegister[6],SensorRegister[7]); // TODO what is this casting?
-	gyroRaw.y = processHighLowBytes(SensorRegister[8],SensorRegister[9]); // TODO what is this casting?
-	gyroRaw.z = processHighLowBytes(SensorRegister[10],SensorRegister[11]); // TODO what is this casting?
-	return gyroRaw;
+void ICM20948::complementaryFilter() {
+	filteredRoll += gyro_y / gyroLSB * dt;	//Integrates the angular rate of X axis over dt to return absolute position of X axis.
+	filteredPitch += gyro_x / gyroLSB * dt;	//Integrates the angular rate of Y axis over dt to return absolute position of Y axis.
+
+	totalAccelVector = sqrt((accXg*accXg)+(accYg*accYg)+(accZg*accZg));  	//Calculates the total accelerometer vector.
+
+	anglePitchAccel = atan2f(accYg, (sqrt((accXg * accXg) + (accZg * accZg)))) * radToDeg;
+	angleRollAccel = atan2f(-accXg, accZg) * radToDeg;
+
+	if (totalAccelVector < maxGravity) {
+		filteredPitch = filteredPitch * alpha + anglePitchAccel * (1-alpha);
+		filteredRoll = filteredRoll * alpha + angleRollAccel * (1-alpha);
+	}
+
+
+	// TODO prints for debugging, remove when done !
+	//Serial.println(yaw);
+
 }
 
 /*
@@ -247,6 +285,37 @@ void ICM20948::printVector(Vector print){
 	Serial.print(print.z);
 	Serial.print("\n");
 }
+
+/*
+ * TODO comment this boy
+ * @return A Vector containing the raw accel data
+ */
+Vector ICM20948::getAccRawValues(){
+	Vector accRaw;
+	accRaw.x = this.acc_x_raw; // TODO what is this casting?
+	accRaw.y = this.acc_y_raw; // TODO what is this casting?
+	accRaw.z = this.acc_z_raw; // TODO what is this casting?
+	return accRaw;
+}
+
+/*
+ * TODO comment this boy
+ * @return A Vector containing the raw gyro data
+ */
+Vector ICM20948::getGyroRawValues(){
+	Vector gyroRaw;
+	gyroRaw.x = gyro_x_raw; // TODO what is this casting?
+	gyroRaw.y = gyro_y_raw; // TODO what is this casting?
+	gyroRaw.z = gyro_z_raw; // TODO what is this casting?
+	return gyroRaw;
+}
+
+int16_t ICM20948::getAccX() { return acc_x_raw; }
+int16_t ICM20948::getAccY() { return acc_y_raw; }
+int16_t ICM20948::getAccZ() { return acc_z_raw; }
+int16_t ICM20948::getGyroX() { return gyro_x_raw; }
+int16_t ICM20948::getGyroY() { return gyro_y_raw; }
+int16_t ICM20948::getGyroZ() { return gyro_z_raw; }
 
 uint8_t ICM20948::getPlusMinus250DPS() {
 	return PLUS_MINUS_250DPS;

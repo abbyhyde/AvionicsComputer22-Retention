@@ -15,6 +15,8 @@
 #include "loops/loop.h"
 
 #include "peripherals/ICM20948.h"
+#include "peripherals/MPL3115A2.h"
+#include "peripherals/ServoMotor.h"
 //#include "peripheral/LoRaRadio.h"
 
 
@@ -49,9 +51,11 @@ private:
 	RetentionState retentionState = IDLE;			// initial system state is IDLE
 
 	ICM20948 * imu = new ICM20948(0x68);
+
 	MPL3115A2 * baro = new MPL3115A2();
 
 	// orientation servo
+//	Servo * orientation = new Servo(1);
 	// arm deploy servo 1 and 2
 	// quad gripper servo
 

@@ -31,14 +31,15 @@ bool Retention::systemInit(){
 
 	imu->setGyroScale(imu->getPlusMinus2000DPS());
 	imu->setAccScale(imu->getPlusMinus8Gs());
-
-	baro->init();
-	baro->setModeAltimeter();
-	baro->setOverSampleRate(0);
-	delay(50);							// let barometer start up
+	imu->calibrateGyro();
+//
+//	baro->init();
+//	baro->setModeAltimeter();
+//	baro->setOverSampleRate(0);
+//	delay(50);							// let barometer start up
 
 	// init servos
-
+//	orientation->enable();
 
 	return true;
 
@@ -83,19 +84,19 @@ void Retention::updateStateMachine(uint32_t timestamp){
 
 	//digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
 	//Serial.println(millis());
-	Serial.println(timestamp);
+//	Serial.println(timestamp);
 
 	switch (retentionState) {
 		case Idle:
 			imu->readSensorData();
 			imu->printVector(imu->getGyroRawValues());
-			baro->readSensorData();
+//			baro->readSensorData();
 
-			float currentPressure = baro->getPressure();
-			Serial.println(currentPressure);
-
-			float currentTemperature = baro->getTemperature();
-			Serial.println(currentTemperature);
+//			float currentPressure = baro->getPressure();
+//			Serial.println(currentPressure);
+//
+//			float currentTemperature = baro->getTemperature();
+//			Serial.println(currentTemperature);
 
 			break;
 		case Passive:
