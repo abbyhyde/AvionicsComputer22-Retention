@@ -24,7 +24,7 @@ void ServoMotor::enable() {
 	analogReadRes(8);
 
 	attachMotor(motorPWMpin);
-//	setSpeed(0);
+	setPosition(0);
 
 //	if(currentSensor != 255){						// pin num is a uint so -1 = 255
 //		attachCurrentSensor(currentSensor);
@@ -46,9 +46,9 @@ void ServoMotor::disable() {
 
 }
 
-void ServoMotor::update() {
-
-}
+//void ServoMotor::update() {
+//
+//}
 
 int64_t ServoMotor::getPosition() {
 
@@ -131,41 +131,41 @@ void ServoMotor::setSpeed(float speed) {
 
 void ServoMotor::setPosition(float position) {
 
-	uint16_t setpoint = positionToAnalog(position);
+//	uint16_t setpoint = positionToAnalog(position);
 
-	analogWrite(motorPWMpin, setpoint);
+	analogWrite(motorPWMpin, position);
 }
 
-/*
- * Bind the proper motor signal pin, uses pinMode() and
- * The analog linear potentiometer pin is set
- * This function should not be run in a constructor, only during or after setup()
- * @param encoderPin is the analog input pin for the potentiometer feedback
- */
-void ServoMotor::attachEncoder(uint8_t encoderPin) {
+///*
+// * Bind the proper motor signal pin, uses pinMode() and
+// * The analog linear potentiometer pin is set
+// * This function should not be run in a constructor, only during or after setup()
+// * @param encoderPin is the analog input pin for the potentiometer feedback
+// */
+//void ServoMotor::attachEncoder(uint8_t encoderPin) {
+//
+//	//potPin
+//	// analog pins are input by default, doesn't hurt to pinMode tho
+//	//TODO analogReadResolution
+//	//TODO check to make sure the pin is a proper analog input pin, print error if not?
+//
+//}
 
-	//potPin
-	// analog pins are input by default, doesn't hurt to pinMode tho
-	//TODO analogReadResolution
-	//TODO check to make sure the pin is a proper analog input pin, print error if not?
 
-}
-
-
-/*
- * Bind the proper motor signal pin, uses pinMode() and
- * The (quadrature) encoder pins are set on instantiation of an encoder object.
- * This function should not be run in a constructor, only during or after setup()
- * @param encoderPinA is the encoder signal pin A
- * @param encoderPinB is the encoder signal pin B
- */
-void ServoMotor::attachEncoder(uint8_t encoderPinA, uint8_t encoderPinB) {
-
-	// binding the quad encoder signal pins, Encoder class uses pinMode() in its constructor,
-	// making it necessary to instantiate it in the systemInit which runs after setup()
-	encoder = new Encoder(encoderPinA, encoderPinB);
-
-}
+///*
+// * Bind the proper motor signal pin, uses pinMode() and
+// * The (quadrature) encoder pins are set on instantiation of an encoder object.
+// * This function should not be run in a constructor, only during or after setup()
+// * @param encoderPinA is the encoder signal pin A
+// * @param encoderPinB is the encoder signal pin B
+// */
+//void ServoMotor::attachEncoder(uint8_t encoderPinA, uint8_t encoderPinB) {
+//
+//	// binding the quad encoder signal pins, Encoder class uses pinMode() in its constructor,
+//	// making it necessary to instantiate it in the systemInit which runs after setup()
+//	encoder = new Encoder(encoderPinA, encoderPinB);
+//
+//}
 
 
 /**
@@ -175,7 +175,7 @@ void ServoMotor::attachEncoder(uint8_t encoderPinA, uint8_t encoderPinB) {
  * @param directionPin1 is the first direction toggling pin for the motor controller
  * @param directionPin2 is the second direction toggling pin for the motor controller
  */
-void ServoMotor::attachMotor(uint8_t pwmPin, uint8_t directionPin1, uint8_t directionPin2) {
+void ServoMotor::attachMotor(uint8_t pwmPin) {
 
 	pinMode(pwmPin, OUTPUT);
 //	pinMode(directionPin1, OUTPUT);
@@ -184,16 +184,16 @@ void ServoMotor::attachMotor(uint8_t pwmPin, uint8_t directionPin1, uint8_t dire
 }
 
 
-/**
- * Bind the proper motor signal pin for direct current measurement, uses pinMode()
- * @param currentSensorPin is the analog input pin for the motor controller current feedback
- */
-void ServoMotor::attachCurrentSensor(uint8_t currentSensorPin) {
-
-	//currentSensor
-	// analog pins are input by default, doesn't hurt to pinMode tho
-	//TODO analogReadResolution
-	//TODO check to make sure the pin is a proper analog input pin, print error if not?
-
-}
+///**
+// * Bind the proper motor signal pin for direct current measurement, uses pinMode()
+// * @param currentSensorPin is the analog input pin for the motor controller current feedback
+// */
+//void ServoMotor::attachCurrentSensor(uint8_t currentSensorPin) {
+//
+//	//currentSensor
+//	// analog pins are input by default, doesn't hurt to pinMode tho
+//	//TODO analogReadResolution
+//	//TODO check to make sure the pin is a proper analog input pin, print error if not?
+//
+//}
 

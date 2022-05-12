@@ -50,15 +50,16 @@ private:
 
 	RetentionState retentionState = IDLE;			// initial system state is IDLE
 
-	ICM20948 * imu = new ICM20948(0x68);
+	ICM20948 * imu = new ICM20948(0x69);
 
 	MPL3115A2 * baro = new MPL3115A2();
 
 	// orientation servo
-//	Servo * orientation = new Servo(1);
+	ServoMotor * orientation = new ServoMotor(14);
 	// arm deploy servo 1 and 2
 	// quad gripper servo
-
+	uint8_t pos;
+	bool up;
 
 public:
 
@@ -83,7 +84,7 @@ public:
 		void onStop(uint32_t timestamp){
 			retention_->endStateMachine();
 		}
-	} * RetentionLoop = new RetentionLoop(this);		// instantiate the main system loop and pass it the system instance
+	} * retentionLoop = new RetentionLoop(this);		// instantiate the main system loop and pass it the system instance
 
 
 
@@ -91,6 +92,7 @@ public:
 	void registerAllLoops(Looper * runningLooper);
 
 	void zeroAllSensors();
+	void collectSensorData();
 
 	void beginStateMachine();
 	void updateStateMachine(uint32_t timestamp);

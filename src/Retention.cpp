@@ -20,6 +20,8 @@ bool Retention::systemInit(){
 
 	//pinMode(LED_BUILTIN, OUTPUT);		// ! will conflict with CLK if using SPI !
 
+	pos = 0;
+	up = true;
 	// init sensors
 	bool initIMU = false;
 	initIMU = imu->init();
@@ -27,7 +29,10 @@ bool Retention::systemInit(){
 	if(!initIMU){
 		Serial.println("ICM20948 does not respond");
 	}
-	else{Serial.println("ICM20948 is connected");}
+	else{
+		Serial.println("ICM20948 is connected");
+
+	}
 
 	imu->setGyroScale(imu->getPlusMinus2000DPS());
 	imu->setAccScale(imu->getPlusMinus8Gs());
@@ -39,7 +44,8 @@ bool Retention::systemInit(){
 //	delay(50);							// let barometer start up
 
 	// init servos
-//	orientation->enable();
+	orientation->enable();
+	Serial.println("enabled servo");
 
 	return true;
 
@@ -54,7 +60,7 @@ bool Retention::systemInit(){
  */
 void Retention::registerAllLoops(Looper * runningLooper){
 
-	runningLooper->registerLoop(robotLoop);
+	runningLooper->registerLoop(retentionLoop);
 
 }
 
@@ -67,13 +73,26 @@ void Retention::zeroAllSensors(){
 
 }
 
+void Retention::collectSensorData() {
+
+	imu->readSensorData();
+	imu->complementaryFilter();
+	baro->readSensorData();
+
+//	int16_t accelZ = imu->getAccZ();
+
+//	Serial.println(imu->getRoll());
+
+	// log it in SD?
+}
+
 
 /*
  * Configuring retention subsystems for start of mission states sequence
  */
 void Retention::beginStateMachine(){
 
-	Serial.println(F("STARTED ROBOT LOOP"));
+	Serial.println(F("STARTED RETENTION LOOP"));
 	//zeroAllSensors();
 
 }
@@ -81,16 +100,27 @@ void Retention::beginStateMachine(){
 
 void Retention::updateStateMachine(uint32_t timestamp){
 
-
+	collectSensorData();
 	//digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
 	//Serial.println(millis());
 //	Serial.println(timestamp);
 
 	switch (retentionState) {
-		case Idle:
-			imu->readSensorData();
-			imu->printVector(imu->getGyroRawValues());
-//			baro->readSensorData();
+		case IDLE:
+			//Serial.println(imu->getPitch());
+			orientation->setPosition(pos);
+			if (up && pos != 255) {
+				pos++;
+			} else if (up && pos == 255) {
+				up = false;
+				pos--;
+			} else if (!up && pos != 0) {
+				pos--;
+			} else {
+				up = true;
+				pos++;
+			}
+			Serial.println(pos);
 
 //			float currentPressure = baro->getPressure();
 //			Serial.println(currentPressure);
@@ -99,45 +129,41 @@ void Retention::updateStateMachine(uint32_t timestamp){
 //			Serial.println(currentTemperature);
 
 			break;
-		case Passive:
+		case PASSIVE:
 			// on pad state
 			// data collection from all sensors
-			//imu->readSensorData();
+			// passive to flight = lots of accel
 
 			break;
-		case Flight:
+		case FLIGHT:
 			// data collection from all sensors
-			//imu->readSensorData();
+			// flight to landed = lots of decel
 
 			break;
-		case Landed:
+		case LANDED:
 			// check for switch signal
-			//imu->readSensorData();
+			// landed to orientation = switch signal
 
 			break;
-		case Orientation:
-			//imu->readSensorData();
+		case ORIENTATION:
 
 			// spin servo to rotate
 			// until accel is correct values
 
 			break;
-		case Unfold:
-			//imu->readSensorData();
+		case UNFOLD:
 
 			// activate servos until set point
 
 			break;
-		case Flight_Check:
-			//imu->readSensorData();
+		case FLIGHT_CHECK:
 
 			// drone does the thing
 			// receiving data?
 			// check for final signal from team
 
 			break;
-		case Release:
-			//imu->readSensorData();
+		case RELEASE:
 
 			// servo spins to release body (quad gripper)
 

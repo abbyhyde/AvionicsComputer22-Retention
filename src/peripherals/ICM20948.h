@@ -6,6 +6,7 @@
  */
 
 #include <Wire.h>
+#include "Arduino.h"
 
 #define ICM20948_ADDRESS			 0x68
 
@@ -37,7 +38,7 @@
 #define PLUS_MINUS_8G				 2		// 2^12 = 4096  LSB/g
 #define PLUS_MINUS_16G				 3		// 2^11 = 2048  LSB/g
 
-
+#define DT_LOOPER					 0.01
 
 struct Vector
 {
@@ -62,13 +63,15 @@ public:
     void setAccScale(uint8_t value);
 
     void readSensorData();
+    void calibrateGyro();
+    void complementaryFilter();
 
     void printVector(Vector print);
-
     void printBuffer();
 
-    Vector getGyroRawValues(); // TODO FOR TESTING ONLY
     Vector getAccRawValues();  //TODO FOR TESTING ONLY
+    Vector getGyroRawValues(); // TODO FOR TESTING ONLY
+    int16_t getTempRawValues();
 
     int16_t getAccX();
     int16_t getAccY();
@@ -76,10 +79,8 @@ public:
     int16_t getGyroX();
     int16_t getGyroY();
     int16_t getGyroZ();
-
-    void calibrateGyro();
-
-    int16_t getTempRawValues();
+    float getRoll();
+    float getPitch();
 
     uint8_t getPlusMinus250DPS();
     uint8_t getPlusMinus500DPS();
@@ -90,7 +91,6 @@ public:
     uint8_t getPlusMinus4Gs();
     uint8_t getPlusMinus8Gs();
     uint8_t getPlusMinus16Gs();
-
 
 private:
 
@@ -110,22 +110,37 @@ private:
 	int16_t gyro_y_raw = 0;
 	int16_t gyro_z_raw = 0;
 
+	const float dt = DT_LOOPER;
+	const float radToDeg = 180 / 3.14159;
+	const float alpha = 0.98;
+	const float maxGravity = 2;
+
+
+	float roll = 0;
+	float pitch = 0;
+	float yaw = 0;
+
+	float totalAccelVector = 0;
+	float anglePitchAccel = 0 ;
+	float angleRollAccel = 0;
+
+	float filteredPitch = 0;
+	float filteredRoll = 0;
+
+	int16_t temperature = 0;
+
+    uint8_t resetSensor();
+    void sleep(bool sleep);
+
     void switchBank(uint8_t newBank);
+    int16_t processHighLowBytes(uint8_t Hbyte, uint8_t Lbyte);
 
     uint8_t writeRegister8(uint8_t bank, uint8_t reg, uint8_t val);
     uint8_t writeRegister16(uint8_t bank, uint8_t reg, int16_t val);
     uint8_t readRegister8(uint8_t bank, uint8_t reg);
     int16_t readRegister16(uint8_t bank, uint8_t reg);
-    int16_t processHighLowBytes(uint8_t Hbyte, uint8_t Lbyte);
-
-    uint8_t resetSensor();
-    void sleep(bool sleep);
-    // TODO FOR TESTING ONLY Vector getGyroRawValues();
-
-    void complementaryFilter();
-
-    uint8_t read8I2C(uint8_t regAddress);
-    void write8I2C(uint8_t regAddress, uint8_t value);
+    uint8_t read8I2C(uint8_t reg);
+    uint8_t write8I2C(uint8_t reg, uint8_t val);
 
 };
 
