@@ -55,7 +55,7 @@ private:
 	MPL3115A2 * baro = new MPL3115A2();
 
 	// orientation servo
-	ServoMotor * orientation = new ServoMotor(14);
+	ServoMotor * orientation = new ServoMotor(9);
 	// arm deploy servo 1 and 2
 	// quad gripper servo
 	uint8_t pos;

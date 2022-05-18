@@ -38,7 +38,7 @@ public:
 
 private:
 	uint16_t analogRes = 8;
-	char motorPWMpin;
+	uint8_t motorPWMpin;
 
 };
 

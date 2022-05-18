@@ -21,24 +21,11 @@ ServoMotor::ServoMotor(uint8_t pwmPin) {
 
 void ServoMotor::enable() {
 
-	analogReadRes(8);
+	servo.attach(motorPWMpin);
 
-	attachMotor(motorPWMpin);
-	setPosition(0);
+	//attachMotor(motorPWMpin);
+	//setPosition(0);
 
-//	if(currentSensor != 255){						// pin num is a uint so -1 = 255
-//		attachCurrentSensor(currentSensor);
-//	}
-
-//	if(useQuadEncoder) {		// motor was instantiated to use a quadrature encoder for feedback?
-//		attachEncoder(encoderA, encoderB);
-//	}
-//	else if(usePot) {			// motor was instantiated to use a potentiometer for feedback?
-//		attachEncoder(potPin);
-//	}
-//	else { // if we end up here, constructor must not have been run properly...
-//
-//	}
 
 }
 
@@ -131,9 +118,10 @@ void ServoMotor::setSpeed(float speed) {
 
 void ServoMotor::setPosition(float position) {
 
-//	uint16_t setpoint = positionToAnalog(position);
+	//analogWrite(motorPWMpin, position);
 
-	analogWrite(motorPWMpin, position);
+	servo.write(position);
+
 }
 
 ///*
