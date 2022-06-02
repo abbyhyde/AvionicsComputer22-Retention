@@ -23,21 +23,9 @@ public:
     ServoMotor(uint8_t pwmPin);
     void enable();
     void disable();
-    int64_t getPosition();
-    uint16_t positionToAnalog(float position);
-    uint16_t speedToAnalog(float speed);
-    float fMap(float x, float inMin, float inMax, float outMin, float outMax);
-    void setSpeed(float speed);
-    void setPosition(float position);
-    void attachMotor(uint8_t pwmPin);
-//    void ServoMotor::attachEncoder(uint8_t encoderPin);
-//    void ServoMotor::attachEncoder(uint8_t encoderPinA, uint8_t encoderPinB);
-
-
-
+    void setPosition(uint8_t position);
 
 private:
-	uint16_t analogRes = 8;
 	uint8_t motorPWMpin;
 
 };

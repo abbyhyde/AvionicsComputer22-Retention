@@ -19,6 +19,14 @@
 #include "peripherals/ServoMotor.h"
 //#include "peripheral/LoRaRadio.h"
 
+// Servo Motor Pins
+#define ORIENTATION_MOTOR 9
+#define ARM_RELEASE_MOTOR_1 10
+#define ARM_RELEASE_MOTOR_2 11
+#define QUAD_GRIPPER_MOTOR 12
+
+#define ICM_ADDRESS 0x69
+
 
 /*
  * Retention has TODO primary states of autonomous operation throughout its mission which begins when the system is powered on
@@ -29,7 +37,7 @@ enum RetentionState {
 
 	IDLE,
 	PASSIVE, 			// safe mode until massive accel
-	FLIGHT, 			// until landing detected
+	ROCKET_FLIGHT, 		// until landing detected
 	LANDED,				// until switch is triggered manually
 	ORIENTATION,		// until rotation complete
 	UNFOLD, 			// until quad arms are out
@@ -50,16 +58,25 @@ private:
 
 	RetentionState retentionState = IDLE;			// initial system state is IDLE
 
-	ICM20948 * imu = new ICM20948(0x69);
+	ICM20948 * imu = new ICM20948(ICM_ADDRESS);
 
 	MPL3115A2 * baro = new MPL3115A2();
 
 	// orientation servo
-	ServoMotor * orientation = new ServoMotor(9);
+	ServoMotor * orientation = new ServoMotor(ORIENTATION_MOTOR);
 	// arm deploy servo 1 and 2
+	ServoMotor * armMotor1 = new ServoMotor(ARM_RELEASE_MOTOR_1);
+	ServoMotor * armMotor2 = new ServoMotor(ARM_RELEASE_MOTOR_2);
 	// quad gripper servo
-	uint8_t pos;
-	bool up;
+	ServoMotor * quadGripper = new ServoMotor(QUAD_GRIPPER_MOTOR);
+
+	uint8_t pos = 0;
+	int16_t currentAccel;				// current accel value for PASSIVE and ROCKET_FLIGHT states
+	float currentRoll;					// current roll value for ORIENTATION state
+
+	int16_t launchThreshold = 10; 		// int16_t to be consistent with the accel val
+	int16_t landedThreshold = -10;
+	uint8_t armDeployThreshold = 100; 	// the angle the servo needs to move to in order to release the quad arms
 
 public:
 

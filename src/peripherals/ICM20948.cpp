@@ -171,20 +171,31 @@ void ICM20948::calibrateGyro() {
 /*
  * An iterative function that filters the roll and pitch for every time the data updates
  * Based on code from 2020-2021 year
- * when launched, roll and pitch are valid
- * when landed, pitch and yaw are valid
+ * when launched, roll and pitch are useful
+ * when landed, pitch and yaw are useful
  * yaw -> roll
  * pitch = pitch
  * roll -> yaw
  */
-void ICM20948::complementaryFilter() {
-	filteredRoll += gyro_y_raw / 131 * dt;	//Integrates the angular rate of X axis over dt to return absolute position of X axis.
-	filteredPitch += gyro_x_raw / 131 * dt;	//Integrates the angular rate of Y axis over dt to return absolute position of Y axis.
-
+void ICM20948::complementaryFilter(bool landed) {
 	totalAccelVector = sqrt((acc_x_raw*acc_x_raw)+(acc_y_raw*acc_y_raw)+(acc_z_raw*acc_z_raw));  	//Calculates the total accelerometer vector.
 
-	anglePitchAccel = atan2f(acc_y_raw, (sqrt((acc_x_raw * acc_x_raw) + (acc_z_raw * acc_z_raw)))) * radToDeg;
-	angleRollAccel = atan2f(-acc_x_raw, acc_z_raw) * radToDeg;
+	if (landed) {
+		// if payload is horizontal, pitch should use the z axis
+		filteredRoll += gyro_y_raw / 131 * dt;	//Integrates the angular rate of X axis over dt to return absolute position of X axis.
+		filteredPitch += gyro_z_raw / 131 * dt;	//Integrates the angular rate of Y axis over dt to return absolute position of Y axis.
+
+		anglePitchAccel = atan2f(acc_y_raw, (sqrt((acc_x_raw * acc_x_raw) + (acc_z_raw * acc_z_raw)))) * radToDeg;
+		angleRollAccel = atan2f(-acc_z_raw, acc_x_raw) * radToDeg;
+
+	} else {
+		// if payload is vertical (during flight), pitch should use the x axis
+		filteredRoll += gyro_y_raw / 131 * dt;	//Integrates the angular rate of X axis over dt to return absolute position of X axis.
+		filteredPitch += gyro_x_raw / 131 * dt;	//Integrates the angular rate of Y axis over dt to return absolute position of Y axis.
+
+		anglePitchAccel = atan2f(acc_y_raw, (sqrt((acc_x_raw * acc_x_raw) + (acc_z_raw * acc_z_raw)))) * radToDeg;
+		angleRollAccel = atan2f(-acc_x_raw, acc_z_raw) * radToDeg;
+	}
 
 	if (totalAccelVector < maxGravity) {
 		filteredPitch = filteredPitch * alpha + anglePitchAccel * (1-alpha);

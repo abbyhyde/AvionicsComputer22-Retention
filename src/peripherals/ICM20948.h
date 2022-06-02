@@ -64,7 +64,7 @@ public:
 
     void readSensorData();
     void calibrateGyro();
-    void complementaryFilter();
+    void complementaryFilter(bool landed);
 
     void printVector(Vector print);
     void printBuffer();
