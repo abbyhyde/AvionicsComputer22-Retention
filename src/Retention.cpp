@@ -43,6 +43,9 @@ bool Retention::systemInit(){
 
 	// init servos
 	orientation->enable();
+	armMotor1->enable();
+	armMotor2->enable();
+	quadGripper->enable();
 	Serial.println("enabled servo");
 
 	return true;
