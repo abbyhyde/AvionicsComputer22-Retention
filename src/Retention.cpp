@@ -29,7 +29,6 @@ bool Retention::systemInit(){
 	}
 	else{
 		Serial.println("ICM20948 is connected");
-
 	}
 
 	imu->setGyroScale(imu->getPlusMinus2000DPS());
@@ -151,18 +150,30 @@ void Retention::updateStateMachine(uint32_t timestamp){
 
 		case ORIENTATION:
 			// spin servo to rotate until accel is correct values
-			currentRoll = imu->getPitch();
-			if (currentRoll > 0) {						// probably needs to be some sort of range but idk how sensitive the measurements are
-				pos++;
-				orientation->setPosition(pos);
-			} else if (currentRoll < 0) {
-				pos--;
-				orientation->setPosition(pos);
-			} else {
-				Serial.println("Switching to UNFOLD");
-				retentionState = UNFOLD;
-				pos = 0;
-			}
+			Serial.print("Called");
+			imu->readSensorData();
+			Serial.print(imu->getAccX());
+			Serial.print(",");
+			Serial.print(imu->getAccY());
+			Serial.print(",");
+			Serial.print(imu->getAccZ());
+			Serial.println();
+			armMotor1->setPosition(50);
+			armMotor2->setPosition(50);
+//			imu->printBuffer();
+//			currentRoll = imu->getAccZ();
+//			Serial.println(currentRoll);
+//			if (currentRoll > 0) {						// probably needs to be some sort of range but idk how sensitive the measurements are
+//				pos++;
+//				orientation->setPosition(pos);
+//			} else if (currentRoll < 0) {
+//				pos--;
+//				orientation->setPosition(pos);
+//			} else {
+//				Serial.println("Switching to UNFOLD");
+//				retentionState = UNFOLD;
+//				pos = 0;
+//			}
 
 			break;
 

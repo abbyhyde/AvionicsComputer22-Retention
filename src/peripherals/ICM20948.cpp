@@ -136,6 +136,7 @@ void ICM20948::readSensorData(){
 	this->gyro_y_raw = processHighLowBytes(SensorRegister[8],SensorRegister[9]) - gyro_y_cal;
 	this->gyro_z_raw = processHighLowBytes(SensorRegister[10],SensorRegister[11]) - gyro_z_cal;
 
+
 }
 
 /*

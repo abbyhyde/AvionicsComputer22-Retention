@@ -20,12 +20,12 @@
 //#include "peripheral/LoRaRadio.h"
 
 // Servo Motor Pins
-#define ORIENTATION_MOTOR 9
-#define ARM_RELEASE_MOTOR_1 10
-#define ARM_RELEASE_MOTOR_2 11
-#define QUAD_GRIPPER_MOTOR 12
+#define ORIENTATION_MOTOR 14
+#define ARM_RELEASE_MOTOR_1 3
+#define ARM_RELEASE_MOTOR_2 6
+#define QUAD_GRIPPER_MOTOR 15
 
-#define ICM_ADDRESS 0x69
+#define ICM_ADDRESS 0x68
 
 
 /*
@@ -56,7 +56,7 @@ class Retention : public SystemInterface {
 
 private:
 
-	RetentionState retentionState = IDLE;			// initial system state is IDLE
+	RetentionState retentionState = ORIENTATION;			// initial system state is IDLE
 
 	ICM20948 * imu = new ICM20948(ICM_ADDRESS);
 
